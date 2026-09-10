@@ -19,6 +19,7 @@ import { ContactListComponent } from './contact-list/contact-list.component';
 import { ContactFormComponent } from './contact-form/contact-form.component';
 import { ContactDetailComponent } from './contact-detail/contact-detail.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -43,6 +44,7 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
+    HttpClientModule,
     MatDialogModule
    
   ],

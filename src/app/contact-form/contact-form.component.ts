@@ -35,33 +35,36 @@ export class ContactFormComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
-      this.contactId = Number(id);
-      this.editMode = true;
+        this.contactId = Number(id);
+        this.editMode = true;
 
-      const contact = this.contactService.getById(this.contactId);
-
-      if (contact) {
+        this.contactService.getById(this.contactId).subscribe(contact => {
         this.contactForm.patchValue(contact);
-      }
+        });
     }
   }
 
   save(): void {
-    if (this.contactForm.invalid) {
-      return;
-    }
-
-    const contact: Contact = this.contactForm.value;
-
-    if (this.editMode && this.contactId) {
-      contact.id = this.contactId;
-      this.contactService.update(contact);
-    } else {
-      this.contactService.create(contact);
-    }
-
-    this.router.navigate(['/contacts']);
+  if (this.contactForm.invalid) {
+    return;
   }
+
+  const contact: Contact = this.contactForm.value;
+
+  if (this.editMode && this.contactId) {
+    contact.id = this.contactId;
+
+    this.contactService.update(contact).subscribe(() => {
+      this.router.navigate(['/contacts']);
+    });
+
+  } else {
+
+    this.contactService.create(contact).subscribe(() => {
+      this.router.navigate(['/contacts']);
+    });
+  }
+}
 
   cancel(): void {
     this.router.navigate(['/contacts']);

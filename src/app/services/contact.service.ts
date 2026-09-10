@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Contact } from '../models/contact';
 
 @Injectable({
@@ -6,51 +8,30 @@ import { Contact } from '../models/contact';
 })
 export class ContactService {
 
-  private contacts: Contact[] = [
-    {
-      id: 1,
-      firstName: 'Emma',
-      lastName: 'Martin',
-      phone: '06 11 22 33 44',
-      email: 'emma.martin@example.com',
-      address: '12 rue de Paris'
-    },
-    {
-      id: 2,
-      firstName: 'Lucas',
-      lastName: 'Bernard',
-      phone: '06 55 66 77 88',
-      email: 'lucas.bernard@example.com',
-      address: '8 avenue Victor Hugo'
-    }
-  ];
+  private apiUrl = 'http://localhost:8080/api/contacts';
 
-  getAll(): Contact[] {
-    return this.contacts;
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Contact[]> {
+    return this.http.get<Contact[]>(this.apiUrl);
   }
 
-  getById(id: number): Contact | undefined {
-    return this.contacts.find(contact => contact.id === id);
+  getById(id: number): Observable<Contact> {
+    return this.http.get<Contact>(`${this.apiUrl}/${id}`);
   }
 
-  create(contact: Contact): void {
-    const maxId = this.contacts.length
-      ? Math.max(...this.contacts.map(c => c.id || 0))
-      : 0;
-
-    contact.id = maxId + 1;
-    this.contacts.push(contact);
+  create(contact: Contact): Observable<Contact> {
+    return this.http.post<Contact>(this.apiUrl, contact);
   }
 
-  update(contact: Contact): void {
-    const index = this.contacts.findIndex(c => c.id === contact.id);
-
-    if (index !== -1) {
-      this.contacts[index] = contact;
-    }
+  update(contact: Contact): Observable<Contact> {
+    return this.http.put<Contact>(
+      `${this.apiUrl}/${contact.id}`,
+      contact
+    );
   }
 
-  delete(id: number): void {
-    this.contacts = this.contacts.filter(contact => contact.id !== id);
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

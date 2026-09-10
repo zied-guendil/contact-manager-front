@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Contact } from '../models/contact';
 import { ContactService } from '../services/contact.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-
+import { ExportService } from '../services/export.service';
 @Component({
   selector: 'app-contact-list',
   templateUrl: './contact-list.component.html',
@@ -29,6 +29,7 @@ export class ContactListComponent implements AfterViewInit {
 
   constructor(
     private contactService: ContactService,
+    private exportService: ExportService,
     private dialog: MatDialog
   ) {
     this.loadContacts();
@@ -38,27 +39,33 @@ export class ContactListComponent implements AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
+  exportCsv(): void {
+  this.exportService.exportContacts(this.dataSource.data);
+  }
+  
   loadContacts(): void {
-    this.dataSource.data = this.contactService.getAll();
+    this.contactService.getAll().subscribe(contacts => {
+    this.dataSource.data = contacts;
+  });
   }
 
   applyFilter(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.dataSource.filter = value.trim().toLowerCase();
   }
+deleteContact(contact: Contact): void {
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    data: {
+      name: contact.firstName + ' ' + contact.lastName
+    }
+  });
 
-  deleteContact(contact: Contact): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: {
-        name: contact.firstName + ' ' + contact.lastName
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && contact.id) {
-        this.contactService.delete(contact.id);
+  dialogRef.afterClosed().subscribe(result => {
+    if (result && contact.id) {
+      this.contactService.delete(contact.id).subscribe(() => {
         this.loadContacts();
-      }
-    });
-  }
+      });
+    }
+  });
+}
 }
