@@ -1,0 +1,15 @@
+<mat-toolbar color="primary">
+  <span>Contact Manager</span>
+  <span class="spacer"></span>
+
+  <a mat-button routerLink="/contacts" *ngIf="authService.isLoggedIn()">
+    Contacts
+  </a>
+
+  <button mat-button *ngIf="authService.isLoggedIn()" (click)="logout()">
+    Logout
+  </button>
+</mat-toolbar>
+
+
+<router-outlet></router-outlet>
